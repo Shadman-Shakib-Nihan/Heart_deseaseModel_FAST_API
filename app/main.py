@@ -7,6 +7,7 @@ Trained on heart.csv, saved as heart_disease_model.joblib
 Pydantic models defined in app/schemas.py
 ---------------------------------------------------------
 Endpoints:
+GET  /         -> welcome message + links to docs
 GET  /health   -> simple liveness check
 GET  /info     -> model type + feature list
 POST /predict  -> returns heart_disease true/false + probability
@@ -40,6 +41,26 @@ FEATURE_NAMES = [
     "age", "sex", "cp", "trestbps", "chol", "fbs", "restecg",
     "thalach", "exang", "oldpeak", "slope", "ca", "thal"
 ]
+
+
+# ----------------------------------------------------------------
+# GET / -> Root welcome route (so hitting the base URL isn't a 404)
+# ----------------------------------------------------------------
+@app.get("/")
+def root():
+    """
+    Landing page for quick sanity checks — confirms the API is up
+    and points to the interactive docs and available endpoints.
+    """
+    return {
+        "message": "Heart Disease Prediction API is running",
+        "docs": "/docs",
+        "endpoints": {
+            "health": "/health",
+            "info": "/info",
+            "predict": "POST /predict"
+        }
+    }
 
 
 # ----------------------------------------------------------------
@@ -95,5 +116,5 @@ def predict_heart_disease(data: HeartInput):
             "probability": round(float(probability), 4)
         }
 
-    except Exception as e:
+    except Exception as e: 
         raise HTTPException(status_code=400, detail=f"Prediction failed: {str(e)}")
